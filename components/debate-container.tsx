@@ -168,7 +168,7 @@ export function DebateContainer() {
             onKeyPress={(e) => e.key === "Enter" && startDebate()}
           />
           <Button onClick={startDebate} disabled={!question.trim() || isDebating} className="px-6">
-            {isDebating ? "Live..." : "Start Podcast"}
+            {isDebating ? "Live..." : "Start Debate"}
           </Button>
         </div>
 
