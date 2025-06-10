@@ -226,9 +226,24 @@ export function DebateContainer() {
             className="flex-1 min-h-[60px] resize-none"
             onKeyPress={handleKeyPress}
           />
-          <Button onClick={addComment} disabled={!comment.trim()} className="self-end">
-            Send
-          </Button>
+          <div className="flex flex-col gap-2 justify-end">
+            {isDebating && (
+              <Button
+                onClick={() => {
+                  setIsDebating(false)
+                  setMessages((prev) => prev.map((msg) => ({ ...msg, isStreaming: false })))
+                }}
+                variant="outline"
+                size="sm"
+                className="text-red-600 border-red-300 hover:bg-red-50"
+              >
+                ⏹️ Stop
+              </Button>
+            )}
+            <Button onClick={addComment} disabled={!comment.trim()}>
+              Send
+            </Button>
+          </div>
         </div>
       </div>
     </div>
