@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,11 +16,19 @@ interface Message {
   isStreaming?: boolean
 }
 
+interface ConversationMessage {
+  role: "system" | "user" | "assistant"
+  content: string
+}
+
 export function DebateContainer() {
   const [question, setQuestion] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
   const [comment, setComment] = useState("")
   const [isDebating, setIsDebating] = useState(false)
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([])
+  const [currentTurn, setCurrentTurn] = useState<"pro" | "con">("pro")
+  const [turnCount, setTurnCount] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const { streamText } = useStream()
@@ -34,45 +41,70 @@ export function DebateContainer() {
     scrollToBottom()
   }, [messages])
 
+  const addToConversationHistory = (role: "user" | "assistant", content: string) => {
+    setConversationHistory((prev) => [...prev, { role, content }])
+  }
+
+  const takeTurn = async (stance: "pro" | "con") => {
+    const messageId = `${stance}-${Date.now()}`
+
+    // Add streaming message
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: messageId,
+        text: "",
+        type: stance,
+        isStreaming: true,
+      },
+    ])
+
+    let fullMessage = ""
+
+    await streamText(
+      `/api/${stance}`,
+      question,
+      (chunk) => {
+        fullMessage += chunk
+        setMessages((prev) => prev.map((msg) => (msg.id === messageId ? { ...msg, text: fullMessage } : msg)))
+      },
+      () => {
+        setMessages((prev) => prev.map((msg) => (msg.id === messageId ? { ...msg, isStreaming: false } : msg)))
+
+        // Add to conversation history
+        addToConversationHistory("assistant", fullMessage)
+
+        // Continue conversation
+        const nextTurnCount = turnCount + 1
+        setTurnCount(nextTurnCount)
+
+        if (nextTurnCount < 6) {
+          // 3 back-and-forth exchanges (6 total messages)
+          const nextStance = stance === "pro" ? "con" : "pro"
+          setCurrentTurn(nextStance)
+
+          // Small delay for natural conversation flow
+          setTimeout(() => {
+            takeTurn(nextStance)
+          }, 1500)
+        } else {
+          setIsDebating(false)
+        }
+      },
+    )
+  }
+
   const startDebate = async () => {
     if (!question.trim() || isDebating) return
 
     setIsDebating(true)
     setMessages([])
+    setConversationHistory([])
+    setCurrentTurn("pro")
+    setTurnCount(0)
 
-    // Create initial streaming messages
-    const proId = `pro-${Date.now()}`
-    const conId = `con-${Date.now()}`
-
-    setMessages([
-      { id: proId, text: "", type: "pro", isStreaming: true },
-      { id: conId, text: "", type: "con", isStreaming: true },
-    ])
-
-    // Stream Pro argument
-    streamText(
-      "/api/pro",
-      question,
-      (chunk) => {
-        setMessages((prev) => prev.map((msg) => (msg.id === proId ? { ...msg, text: msg.text + chunk } : msg)))
-      },
-      () => {
-        setMessages((prev) => prev.map((msg) => (msg.id === proId ? { ...msg, isStreaming: false } : msg)))
-      },
-    )
-
-    // Stream Con argument
-    streamText(
-      "/api/con",
-      question,
-      (chunk) => {
-        setMessages((prev) => prev.map((msg) => (msg.id === conId ? { ...msg, text: msg.text + chunk } : msg)))
-      },
-      () => {
-        setMessages((prev) => prev.map((msg) => (msg.id === conId ? { ...msg, isStreaming: false } : msg)))
-        setIsDebating(false)
-      },
-    )
+    // Start with Pro
+    takeTurn("pro")
   }
 
   const addComment = () => {
@@ -84,7 +116,7 @@ export function DebateContainer() {
       type: "you",
     }
 
-    setMessages((prev) => [...prev.slice(-39), newMessage]) // Keep last 40 messages
+    setMessages((prev) => [...prev.slice(-39), newMessage])
     setComment("")
   }
 
@@ -96,33 +128,44 @@ export function DebateContainer() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-8 p-4 bg-white shadow-xl rounded-2xl min-h-[600px] flex flex-col">
+    <div className="max-w-2xl mx-auto mt-8 p-6 bg-white shadow-xl rounded-2xl min-h-[700px] flex flex-col">
       {/* Header */}
       <CardHeader className="pb-4">
-        <CardTitle className="text-center text-xl font-bold text-gray-800">🔥 Controversy-GPT</CardTitle>
-        <div className="flex gap-2 mt-4">
+        <CardTitle className="text-center text-2xl font-bold text-gray-800">🎙️ Controversy Podcast</CardTitle>
+        <p className="text-center text-sm text-gray-600 mb-4">Watch Alex and Jordan debate any topic in real-time</p>
+        <div className="flex gap-2">
           <Input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Enter a controversial topic..."
+            placeholder="Enter a topic for Alex and Jordan to debate..."
             className="flex-1 border-b outline-none placeholder:italic"
             onKeyPress={(e) => e.key === "Enter" && startDebate()}
           />
           <Button onClick={startDebate} disabled={!question.trim() || isDebating} className="px-6">
-            {isDebating ? "Debating..." : "Debate"}
+            {isDebating ? "Live..." : "Start Podcast"}
           </Button>
         </div>
+
+        {isDebating && (
+          <div className="text-center mt-2">
+            <div className="inline-flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              {currentTurn === "pro" ? "Alex" : "Jordan"} is speaking... ({Math.floor(turnCount / 2) + 1}/3 exchanges)
+            </div>
+          </div>
+        )}
       </CardHeader>
 
       {/* Messages */}
       <CardContent className="flex-1 overflow-y-auto max-h-96 mb-4">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
-            <p className="text-lg">🤔</p>
-            <p className="text-sm">Enter a topic to see both sides argue!</p>
+          <div className="text-center text-gray-500 mt-12">
+            <p className="text-4xl mb-4">🎙️</p>
+            <p className="text-lg font-medium">Ready to start the podcast?</p>
+            <p className="text-sm">Alex and Jordan will have a 3-round debate on your topic</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {messages.map((message) => (
               <Bubble key={message.id} text={message.text} type={message.type} isStreaming={message.isStreaming} />
             ))}
@@ -137,7 +180,7 @@ export function DebateContainer() {
           <Textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Add your thoughts..."
+            placeholder="Join the conversation..."
             className="flex-1 min-h-[60px] resize-none"
             onKeyPress={handleKeyPress}
           />

@@ -20,11 +20,11 @@ export function Bubble({ text, type, isStreaming = false }: BubbleProps) {
   const getBubbleStyles = () => {
     switch (type) {
       case "pro":
-        return "bg-green-100 border-green-300 text-green-800 ml-0 mr-8"
+        return "bg-green-50 border-green-200 text-green-900 ml-0 mr-12"
       case "con":
-        return "bg-red-100 border-red-300 text-red-800 ml-8 mr-0"
+        return "bg-red-50 border-red-200 text-red-900 ml-12 mr-0"
       case "you":
-        return "bg-blue-100 border-blue-300 text-blue-800 ml-4 mr-4"
+        return "bg-blue-50 border-blue-200 text-blue-900 ml-4 mr-4"
       default:
         return "bg-gray-100 border-gray-300 text-gray-800"
     }
@@ -33,9 +33,9 @@ export function Bubble({ text, type, isStreaming = false }: BubbleProps) {
   const getLabel = () => {
     switch (type) {
       case "pro":
-        return "🟢 Pro"
+        return "🟢 Alex (Pro)"
       case "con":
-        return "🔴 Con"
+        return "🔴 Jordan (Con)"
       case "you":
         return "🔵 You"
       default:

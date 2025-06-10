@@ -4,12 +4,14 @@ A live debate platform that uses OpenAI to generate Pro and Con arguments for an
 
 ## Features
 
-- 🔥 Real-time streaming debates using OpenAI
-- 🟢 Pro arguments with compelling evidence
-- 🔴 Con arguments with counter-perspectives  
+- 🎙️ Podcast-style debates between AI personas Alex and Jordan
+- 💬 Natural back-and-forth conversation (3 rounds minimum)
+- 🟢 Alex: Optimistic policy advocate (Pro side)
+- 🔴 Jordan: Pragmatic policy critic (Con side)
 - 🔵 User comments and thoughts
 - ⚡ Edge runtime for low latency
 - 📱 Responsive design with Tailwind CSS
+- 🔄 Contextual responses that reference previous statements
 
 ## Quick Start
 
@@ -54,6 +56,3 @@ Deploy to Vercel with one click. Make sure to add your environment variables in 
 - Tailwind CSS
 - OpenAI API
 - Vercel Edge Runtime
-\`\`\`
-
-Finally, let's create the environment variables template:

@@ -7,7 +7,13 @@ export function useStream() {
   const [error, setError] = useState<string | null>(null)
 
   const streamText = useCallback(
-    async (url: string, question: string, onChunk: (chunk: string) => void, onComplete?: () => void) => {
+    async (
+      url: string,
+      question: string,
+      onChunk: (chunk: string) => void,
+      onComplete?: () => void,
+      conversationHistory?: any[],
+    ) => {
       setIsStreaming(true)
       setError(null)
 
@@ -17,7 +23,7 @@ export function useStream() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ question }),
+          body: JSON.stringify({ question, conversationHistory }),
         })
 
         if (!response.ok) {

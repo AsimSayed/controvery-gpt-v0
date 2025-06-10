@@ -1,11 +1,11 @@
-import { debateStream } from "@/lib/openai"
+import { conversationStream } from "@/lib/openai"
 import { type NextRequest, NextResponse } from "next/server"
 
 export const runtime = "edge"
 
 export async function POST(req: NextRequest, { params }: { params: { stance: "pro" | "con" } }) {
   try {
-    const { question } = await req.json()
+    const { question, conversationHistory = [] } = await req.json()
 
     if (!question) {
       return NextResponse.json({ error: "Question is required" }, { status: 400 })
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, { params }: { params: { stance: "pr
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const token of debateStream(params.stance, question)) {
+          for await (const token of conversationStream(params.stance, question, conversationHistory)) {
             controller.enqueue(encoder.encode(token))
           }
           controller.close()
