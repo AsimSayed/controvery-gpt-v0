@@ -202,6 +202,22 @@ export function DebateContainer() {
 
       {/* Comment Box */}
       <div className="border-t pt-4">
+        {/* Pause/Stop Button */}
+        {isDebating && (
+          <div className="flex justify-center mb-4">
+            <Button
+              onClick={() => {
+                setIsDebating(false)
+                setMessages((prev) => prev.map((msg) => ({ ...msg, isStreaming: false })))
+              }}
+              variant="outline"
+              className="text-red-600 border-red-300 hover:bg-red-50"
+            >
+              ⏹️ Stop Debate
+            </Button>
+          </div>
+        )}
+
         <div className="flex gap-2">
           <Textarea
             value={comment}
