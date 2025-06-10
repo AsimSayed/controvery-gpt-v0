@@ -187,7 +187,7 @@ export function DebateContainer() {
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 mt-12">
             <p className="text-4xl mb-4">🎙️</p>
-            <p className="text-lg font-medium">Ready to start the podcast?</p>
+            <p className="text-lg font-medium">Ready to start the debate?</p>
             <p className="text-sm">Alex and Jordan will have a 3-round debate on your topic</p>
           </div>
         ) : (
