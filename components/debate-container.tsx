@@ -131,11 +131,11 @@ export function DebateContainer() {
     <div className="max-w-2xl mx-auto mt-8 p-6 bg-white shadow-xl rounded-2xl min-h-[700px] flex flex-col">
       {/* Header */}
       <CardHeader className="pb-4">
-        <CardTitle className="text-center text-2xl font-bold text-gray-800">🔥 Controversy GPT</CardTitle>
-        <p className="text-center text-sm text-gray-600 mb-4">Watch Alex and Jordan debate any topic in real-time</p>
+        <CardTitle className="text-center font-bold text-gray-800 text-3xl">🔥 Controversy GPT</CardTitle>
+        <p className="text-center text-gray-600 mb-4 text-lg">Watch Alex and Jordan debate any topic in real-time</p>
 
         {/* Topic suggestion */}
-        <div className="text-center mb-4 text-sm">
+        <div className="text-center text-sm mb-7 mt-px space-y-0">
           <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-600 inline-flex items-center gap-1">
             <span className="text-xs">Try:</span>{" "}
             <span className="font-medium">
