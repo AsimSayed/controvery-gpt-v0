@@ -131,7 +131,7 @@ export function DebateContainer() {
     <div className="max-w-2xl mx-auto mt-8 p-6 bg-white shadow-xl rounded-2xl min-h-[700px] flex flex-col">
       {/* Header */}
       <CardHeader className="pb-4">
-        <CardTitle className="text-center text-2xl font-bold text-gray-800">🔥 Controversy Podcast</CardTitle>
+        <CardTitle className="text-center text-2xl font-bold text-gray-800">🔥 Controversy GPT</CardTitle>
         <p className="text-center text-sm text-gray-600 mb-4">Watch Alex and Jordan debate any topic in real-time</p>
 
         {/* Topic suggestion */}
